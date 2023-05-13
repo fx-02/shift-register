@@ -8,66 +8,87 @@
  * class ShiftRegister
  * Description: implements the ILFShiftRegister interface.
  */
+
 public class ShiftRegister implements ILFShiftRegister {
-    ///////////////////////////////////
-    // Create your class variables here
-    ///////////////////////////////////
-    // TODO:
-    int registerSize = 0;
-    int tapSize = 0;
+	private int size;
+	private int tap;
+	private int[] intArray;
+	
+	public ShiftRegister(int size, int tap) {
+		this.size = size;
+		this.tap = tap;
+		intArray = new int[size];
+	}
 
-    ///////////////////////////////////
-    // Create your constructor here:
-    ///////////////////////////////////
-    ShiftRegister(int size, int tap) {
-        // TODO:
-        registerSize = size;
-        tapSize = tap;
-    }
+	public void setSeed(int[] seed) throws Exception {
+		if(seed.length != size)
+			throw new Exception("Seed is not the same size as declared");
+			
+		for(int i=0;i<seed.length;i++){
+			if(seed[i] != 0 && seed[i] != 1) {
+				throw new Exception("Invalid bit entry");
+			}
+		}
+		intArray = seed;
+	}
 
-    ///////////////////////////////////
-    // Create your class methods here:
-    ///////////////////////////////////
-    /**
-     * setSeed
-     * @param seed
-     * Description:
-     */
-    @Override
-    public void setSeed(int[] seed) {
-        // TODO:
-    }
+	public int shift() {
+		int feedbackBit = intArray[size-1] ^ intArray[tap];
+		int[] newArray = new int[size];
+		
+		newArray[0] = feedbackBit;
+		for(int i = 0; i<size-1; i++) {
+			newArray[i+1] = intArray[i];
+		}
+		intArray = newArray;
+		
+		return feedbackBit;
+	}
 
-    /**
-     * shift
-     * @return
-     * Description:
-     */
-    @Override
-    public int shift() {
-        // TODO:
-        return 0;
-    }
+	public int generate(int k) {
+		int num = 0;
+		for(int i=0; i<k; i++) {
+			num = num * 2 + shift();
+		}
+		return num;
+	}
 
-    /**
-     * generate
-     * @param k
-     * @return
-     * Description:
-     */
-    @Override
-    public int generate(int k) {
-        // TODO:
-        return 0;
-    }
+	public static void main(String[] args) throws Exception {
+		int size;
+		// Test 1
+		size = 7;
+        int[] array = new int[size];
+        array[0] = 1;
+        array[1] = 1;
+        array[2] = 1;
+        array[3] = 0;
+        array[4] = 1;
+        array[5] = 0;
+        array[6] = 1;
 
-    /**
-     * Returns the integer representation for a binary int array.
-     * @param array
-     * @return
-     */
-    private int toBinary(int[] array) {
-        // TODO:
-        return 0;
-    }
+        ShiftRegister shifter = new ShiftRegister(size,4);
+        shifter.setSeed(array);
+        for (int i=0; i<size; i++){
+            int j = shifter.shift();
+            System.out.print(j);
+        }
+        System.out.println();
+        
+        //Test 2
+        size = 4;
+        array = new int[size];
+        array[0] = 1;
+        array[1] = 1;
+        array[2] = 1;
+        array[3] = 1;
+        
+        ShiftRegister shifter2 = new ShiftRegister(size,2);
+        shifter2.setSeed(array);
+        for (int i=0; i<size; i++){
+            int j = shifter2.shift();
+            System.out.print(j);
+        }
+        System.out.println();
+        
+	}
 }
